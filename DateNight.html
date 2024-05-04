@@ -19,7 +19,7 @@
             overflow: auto;
         }
 
-        .main-content {
+        .main-content, .password-area {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,7 +46,7 @@
             margin-top: 10px;
         }
 
-        input[type="button"], select {
+        input[type="button"], select, input[type="password"] {
             border: 2px solid #556677;
             border-radius: 4px;
             background-color: #FFFFFF;
@@ -120,9 +120,16 @@
             }
         }
     </style>
+    <script src="password.js"></script>
 </head>
 <body>
-    <div class="main-content">
+    <div id="passwordArea" class="password-area">
+        <h1 class="shared-width">Password Protected</h1>
+        <input type="password" id="passwordInput" class="shared-width" placeholder="Enter password">
+        <input type="button" value="Submit" class="shared-width" onclick="validatePassword()">
+    </div>
+
+    <div id="mainContent" class="main-content" style="display: none;">
         <div class="input-area">
             <h1 class="shared-width">Date Night</h1>
             <select id="text_prompt" class="shared-width" onchange="setPrompt()">
@@ -138,6 +145,7 @@
             <div class="output" id="output"></div>
         </div>
     </div>
+
     <script>
         var prompts = {
             conversation_topic: "Generate a random conversation topic for an interesting or lighthearted topic that could lead to good conversation. Make your response only the requested text/phrasing with no other text.",
