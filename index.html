@@ -136,9 +136,10 @@
                 <option value="">Select a prompt...</option>
                 <option value="conversation_topic">Conversation Topic</option>
                 <option value="wild_hypothetical">Wild Hypothetical</option>
-                <option value="improv_character">Improv Character</option>
+                <option value="improv_character">Improv Character</right>
                 <option value="musical_improv">Musical Improv</option>
             </select>
+
             <input type="button" class="shared-width" value="Generate Text" onclick="generateText()">
         </div>
         <div class="output-container shared-width">
@@ -170,17 +171,20 @@
             var outputElement = document.getElementById('output');
             outputElement.innerHTML = 'Loading...';
 
+            var temperature = 0.7;  // Set the desired temperature here
+
             const data = {
-                model: "gpt-4-0613",
+                model: "gpt-3.5-turbo-0125",
                 messages: [{"role": "system", "content": "You are a helpful assistant."},
-                           {"role": "user", "content": selectedPrompt}]
+                           {"role": "user", "content": selectedPrompt}],
+                temperature: temperature
             };
 
             fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer sk-proj-IO9D3ZHRctrVIupyIHVtT3BlbkFJwAsgKnd4LjNeZuv466Xh'
+                    'Authorization': 'Bearer sk-proj-IRKdKlSYCPZxhiowLLTVT3BlbkFJ2bzjISmUGe6fkbkYFOlk'
                 },
                 body: JSON.stringify(data)
             })
