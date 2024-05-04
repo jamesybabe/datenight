@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Night</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teachers&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Teachers', sans-serif;
+            background-image: url('https://lh3.googleusercontent.com/d/1vy8yTbTDuzLMVqY7MEpuj1R1OarK3n-b=w1000?authuser=0');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            color: #333;
+            overflow: auto;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70%;
+            max-width: 560px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .shared-width {
+            width: 100%;
+            max-width: 560px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        input[type="button"], select {
+            border: 2px solid #556677;
+            border-radius: 4px;
+            background-color: #FFFFFF;
+            color: #000000;
+            font-family: 'Nanum Myeongjo', serif;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="button"]:hover {
+            background-color: #FFDB58; /* Light yellow gold */
+        }
+
+        .output-container {
+            width: 100%;
+            max-width: 560px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .output {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .output p {
+            max-width: 90%;
+            margin: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .output p:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-family: 'Nanum Myeongjo', serif;
+            font-size: 250%;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 10px;
+            text-transform: uppercase;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-family: 'Nanum Myeongjo', serif;
+            color: #333;
+            text-align: center;
+        }
+
+        p, ul {
+            font-family: 'Teachers', sans-serif;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .output p {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="input-area">
+            <h1 class="shared-width">Date Night</h1>
+            <select id="text_prompt" class="shared-width" onchange="setPrompt()">
+                <option value="">Select a prompt...</option>
+                <option value="conversation_topic">Conversation Topic</option>
+                <option value="wild_hypothetical">Wild Hypothetical</option>
+                <option value="improv_character">Improv Character</option>
+                <option value="musical_improv">Musical Improv</option>
+            </select>
+            <input type="button" class="shared-width" value="Generate Text" onclick="generateText()">
+        </div>
+        <div class="output-container shared-width">
+            <div class="output" id="output"></div>
+        </div>
+    </div>
+    <script>
+        var prompts = {
+            conversation_topic: "Generate a random conversation topic for an interesting or lighthearted topic that could lead to good conversation. Make your response only the requested text/phrasing with no other text.",
+            wild_hypothetical: "Generate a wild hypothetical scenario that would allow for interesting conversation around how one might respond or deal with it. Make your response only the requested text/phrasing with no other text.",
+            improv_character: "Generate a random character that someone could use for improv purposes. Keep the character quite succinctly described, like “Name: They are a _____ who is ________”. Make your response only the described phrasing with no other text.",
+            musical_improv: "Generate a prompt for a musical improv challenge. Make the prompt be something zany. Along with the prompt, randomly select one of the following genres: “Rock”, “Girlypop”, “Musical Theatre”, “Folk Music”, “Emo”, “Country”. Please make the prompt not related to the genre, keep them distinct. Please format it with html text formatting so that it is <b><u>Genre:</u></b> ‘Insert genre’<br><br><b><u>Prompt:</u></b> ‘Insert Prompt’"
+        };
+
+        var selectedPrompt = "";
+
+        function setPrompt() {
+            var promptType = document.getElementById("text_prompt").value;
+            selectedPrompt = prompts[promptType];
+        }
+
+        function generateText() {
+            if (selectedPrompt === "") {
+                alert('Please select a prompt type.');
+                return;
+            }
+
+            var outputElement = document.getElementById('output');
+            outputElement.innerHTML = 'Loading...';
+
+            const data = {
+                model: "gpt-4-0613",
+                messages: [{"role": "system", "content": "You are a helpful assistant."},
+                           {"role": "user", "content": selectedPrompt}]
+            };
+
+            fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer sk-proj-IO9D3ZHRctrVIupyIHVtT3BlbkFJwAsgKnd4LjNeZuv466Xh'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.choices && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
+                    const textOutput = data.choices[0].message.content;
+                    outputElement.innerHTML = `<p>${textOutput}</p>`;
+                } else {
+                    outputElement.textContent = 'No text returned or unexpected structure.';
+                }
+            })
+            .catch(error => {
+                console.error('API Call Error:', error);
+                outputElement.textContent = 'Failed to fetch response.';
+            });
+        }
+    </script>
+</body>
+</html>
